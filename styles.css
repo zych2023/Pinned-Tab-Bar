@@ -6,9 +6,10 @@
 /* ---------- 顶部标签栏：逐个标签按各自状态处理 ---------- */
 
 /*
- * 这里靠「提高选择器特异性」压过 Obsidian 自身的规则，原则上不使用强制覆盖标记。
- * 只有宽度必须保留，因为 Obsidian 在拖拽调整标签宽度时会把宽度写成元素内联样式，
- * 内联样式优先级高于任何选择器，只能强制覆盖。
+ * 全部靠「提高选择器特异性」压过 Obsidian 自身的规则，不使用强制覆盖标记。
+ * 收缩模式的宽度用 flex 简写固定：Obsidian 在鼠标移入标签栏时会给每个 header
+ * 写内联 width（lockTabWidths），但 flex-basis 的优先级高于 width，
+ * 所以内联宽度不会把收缩后的标签撑回去。
  */
 
 /* 状态一：收进侧栏 —— 从顶部标签栏隐藏 */
@@ -31,8 +32,9 @@ body.ptb-on
 
 /* 状态二：放回顶部但收缩 —— 压成 44px 的小方块 */
 body.ptb-on .workspace-tabs .workspace-tab-header.ptb-compact-tab {
-  flex: 0 0 44px !important;
-  max-width: 44px !important;
+  flex: 0 0 44px;
+  min-width: 0;
+  max-width: 44px;
   padding: 0;
   overflow: hidden;
 }
