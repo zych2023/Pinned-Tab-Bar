@@ -1,0 +1,11 @@
+# 插件本地设置：包含使用者 vault 里的真实文件路径，不能入库
+data.json
+
+# 排错时由插件生成的 DOM 结构快照
+_ptb-diag.md
+
+# 系统与编辑器杂项
+.DS_Store
+Thumbs.db
+desktop.ini
+*.log

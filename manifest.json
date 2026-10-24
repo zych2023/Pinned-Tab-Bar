@@ -1,0 +1,10 @@
+{
+  "id": "pinned-tab-bar",
+  "name": "Pinned Tab Bar",
+  "version": "1.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "把置顶标签从顶部标签栏分离到独立侧栏，并支持逐个标签放回顶部或收缩显示。",
+  "author": "zych2023",
+  "authorUrl": "https://github.com/zych2023",
+  "isDesktopOnly": false
+}

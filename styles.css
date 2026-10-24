@@ -1,0 +1,287 @@
+/* ============================================================
+   Pinned Tab Bar
+   把置顶标签从顶部标签栏剥离，收进一条独立窄栏
+   ============================================================ */
+
+/* ---------- 顶部标签栏：逐个标签按各自状态处理 ---------- */
+
+/* 状态一：收进侧栏 —— 从顶部标签栏隐藏 */
+body.ptb-on .workspace-tab-header.ptb-hide-tab {
+  display: none !important;
+}
+
+/* 整组标签都收进侧栏时，连那条空白 header 带一起收掉 */
+body.ptb-on .workspace-tabs.ptb-all-hidden > .workspace-tab-header-container {
+  display: none !important;
+}
+
+/* 隐藏后不留多余的分隔条 */
+body.ptb-on .workspace-tab-header.ptb-hide-tab + .workspace-tab-header {
+  border-left: none;
+}
+
+/* 状态二：放回顶部但收缩 —— 压成 44px 的小方块 */
+body.ptb-on .workspace-tab-header.ptb-compact-tab {
+  flex: 0 0 auto !important;
+  width: 44px !important;
+  min-width: 44px !important;
+  max-width: 44px !important;
+  padding: 0 !important;
+  overflow: hidden;
+}
+
+body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-inner {
+  padding: 0 !important;
+  gap: 0 !important;
+  justify-content: center;
+}
+
+/* 原标题、原图标、关闭按钮、置顶小图标一律让位给徽标 */
+body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-inner-title,
+body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-inner-icon,
+body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-inner-close-button,
+body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-status-container {
+  display: none !important;
+}
+
+/* 顶部收缩模式用的首字徽标（由插件注入到 header 内部） */
+.ptb-tab-badge {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+  min-width: 22px;
+  height: 22px;
+  padding: 0 5px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  background-color: hsl(var(--ptb-h, 210) 42% 91%);
+  color: hsl(var(--ptb-h, 210) 46% 30%);
+}
+
+.theme-dark .ptb-tab-badge {
+  background-color: hsl(var(--ptb-h, 210) 26% 25%);
+  color: hsl(var(--ptb-h, 210) 62% 78%);
+}
+
+.ptb-tab-badge.is-long {
+  font-size: 10px;
+  letter-spacing: -0.04em;
+}
+
+/* ---------- 独立栏容器 ---------- */
+
+.ptb-bar {
+  --ptb-icon-size: 18px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+/* 左侧缎带里的竖排形态 */
+.ptb-bar-ribbon {
+  flex-direction: column;
+  justify-content: flex-start;
+  width: 100%;
+  padding: 8px 0 10px;
+  margin: 0 0 6px;
+  border-bottom: 1px solid var(--background-modifier-border);
+}
+
+.ptb-bar-ribbon:first-child {
+  padding-top: 10px;
+}
+
+/* 状态栏里的横排形态 */
+.ptb-bar-status {
+  flex-direction: row;
+  padding: 0 8px 0 4px;
+  margin-right: 6px;
+  border-right: 1px solid var(--background-modifier-border);
+}
+
+/* ---------- 单个徽标 ---------- */
+
+.ptb-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  flex: 0 0 auto;
+
+  width: calc(var(--ptb-icon-size) + 12px);
+  height: calc(var(--ptb-icon-size) + 12px);
+
+  border-radius: var(--radius-s, 6px);
+  cursor: pointer;
+  user-select: none;
+  overflow: hidden;
+
+  /* 主题色由插件按文件路径写入 --ptb-h */
+  background-color: hsl(var(--ptb-h, 210) 42% 91%);
+  color: hsl(var(--ptb-h, 210) 46% 30%);
+
+  transition:
+    background-color 120ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+/* 深色主题下整体压暗，避免刺眼 */
+.theme-dark .ptb-item {
+  background-color: hsl(var(--ptb-h, 210) 26% 25%);
+  color: hsl(var(--ptb-h, 210) 62% 78%);
+}
+
+.ptb-item:hover {
+  background-color: hsl(var(--ptb-h, 210) 52% 84%);
+  transform: translateY(-1px);
+}
+
+.theme-dark .ptb-item:hover {
+  background-color: hsl(var(--ptb-h, 210) 32% 32%);
+}
+
+.ptb-item:active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* 当前正在看的文件：左侧一根强调色竖条 + 边框 */
+.ptb-item.is-active {
+  background-color: hsl(var(--ptb-h, 210) 55% 78%);
+  color: hsl(var(--ptb-h, 210) 60% 22%);
+  box-shadow: inset 0 0 0 1px hsl(var(--ptb-h, 210) 45% 55% / 0.55);
+}
+
+.theme-dark .ptb-item.is-active {
+  background-color: hsl(var(--ptb-h, 210) 40% 38%);
+  color: hsl(var(--ptb-h, 210) 75% 88%);
+  box-shadow: inset 0 0 0 1px hsl(var(--ptb-h, 210) 65% 60% / 0.6);
+}
+
+.ptb-item.is-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 2px;
+  height: 55%;
+  border-radius: 0 2px 2px 0;
+  background: hsl(var(--ptb-h, 210) 65% 40%);
+}
+
+.theme-dark .ptb-item.is-active::before {
+  background: hsl(var(--ptb-h, 210) 80% 70%);
+}
+
+/* 点击后的轻闪，让「跳过去了」这件事有反馈 */
+.ptb-item.is-flash {
+  animation: ptb-flash 400ms ease-out;
+}
+
+@keyframes ptb-flash {
+  0% {
+    box-shadow: 0 0 0 0 hsl(var(--ptb-h, 210) 60% 50% / 0.55);
+  }
+  100% {
+    box-shadow: 0 0 0 8px hsl(var(--ptb-h, 210) 60% 50% / 0);
+  }
+}
+
+/* ---------- 徽标内容 ---------- */
+
+.ptb-item-label {
+  font-size: calc(var(--ptb-icon-size) * 0.72);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  white-space: nowrap;
+  transform: translateY(0.5px);
+}
+
+/* 3~4 个字时缩小一号，塞得下又不糊 */
+.ptb-item-label.is-long {
+  font-size: calc(var(--ptb-icon-size) * 0.56);
+  letter-spacing: -0.04em;
+}
+
+.ptb-item-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ptb-item-icon svg {
+  width: var(--ptb-icon-size);
+  height: var(--ptb-icon-size);
+  stroke-width: 1.75;
+}
+
+/* 图标模式下弱化背景，让它更像原生 ribbon 图标 */
+.ptb-bar-ribbon .ptb-item.ptb-mode-icon {
+  background-color: transparent;
+  color: var(--icon-color, var(--text-muted));
+}
+
+.ptb-bar-ribbon .ptb-item.ptb-mode-icon:hover {
+  background-color: var(--background-modifier-hover);
+  color: var(--text-normal);
+}
+
+.ptb-bar-ribbon .ptb-item.ptb-mode-icon.is-active {
+  background-color: var(--background-modifier-active-hover);
+  color: var(--text-accent);
+  box-shadow: none;
+}
+
+/* ---------- 状态栏形态的细节 ---------- */
+
+.ptb-bar-status .ptb-item {
+  width: calc(var(--ptb-icon-size) + 8px);
+  height: calc(var(--ptb-icon-size) + 8px);
+}
+
+.ptb-bar-status .ptb-item.is-active::before {
+  left: 50%;
+  top: auto;
+  bottom: 1px;
+  transform: translateX(-50%);
+  width: 50%;
+  height: 2px;
+  border-radius: 2px 2px 0 0;
+}
+
+/* ---------- 设置面板说明 ---------- */
+
+.ptb-settings-tip {
+  margin-top: 18px;
+  padding: 12px 14px;
+  border-radius: var(--radius-m, 8px);
+  background: var(--background-secondary);
+  font-size: var(--font-ui-smaller);
+  color: var(--text-muted);
+}
+
+.ptb-settings-tip p {
+  margin: 0 0 6px;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.ptb-settings-tip ul {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.ptb-settings-tip li {
+  margin: 3px 0;
+  line-height: 1.5;
+}
