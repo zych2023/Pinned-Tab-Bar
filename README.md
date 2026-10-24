@@ -18,10 +18,19 @@
 
 ## 安装
 
-插件已放在 `.obsidian/plugins/pinned-tab-bar/`。
+需要 Obsidian 1.4.0 或更高版本。
 
-打开：设置 → 第三方插件 → 已安装插件（点刷新）→ 启用 **Pinned Tab Bar**。
-若列表里没有，重启一次 Obsidian。
+### 手动安装
+
+1. 下载本仓库的 `manifest.json`、`main.js`、`styles.css` 三个文件；
+2. 放进你的 vault 下的 `.obsidian/plugins/pinned-tab-bar/` 目录；
+3. 重启 Obsidian，在 设置 → 第三方插件 里启用 **Pinned Tab Bar**。
+
+### 用 BRAT 安装
+
+1. 安装并启用 BRAT；
+2. 命令面板执行 `BRAT: Add a beta plugin for testing`；
+3. 填入 `zych2023/Pinned-Tab-Bar`。
 
 ## 设置项
 
