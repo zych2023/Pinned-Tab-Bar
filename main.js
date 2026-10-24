@@ -23,6 +23,7 @@ const {
 
 const DEFAULT_SETTINGS = {
   enabled: true,
+  language: 'auto', // 'auto' | 'zh' | 'en'
   position: 'left-top', // 'left-top' | 'left-bottom' | 'status-bar'
   displayMode: 'letter', // 'letter' | 'icon'
   labelLength: 2,
@@ -31,6 +32,181 @@ const DEFAULT_SETTINGS = {
   // 没有记录 = sidebar（默认收进侧栏）
   placementMap: {},
 };
+
+// ---------------------------------------------------------------- 文案
+
+const STRINGS = {
+  zh: {
+    'cmd.refresh': '刷新置顶文件栏',
+    'cmd.toggle': '显示/隐藏置顶文件栏',
+    'cmd.allToSidebar': '全部置顶标签收进侧栏',
+    'cmd.allToTop': '全部置顶标签放回顶部',
+    'cmd.pinCurrent': '把当前标签置顶',
+    'cmd.diagnose': '诊断：导出结构与状态到 _ptb-diag.md',
+
+    'notice.allToSidebar': '所有置顶标签已收进侧栏',
+    'notice.allToTop': '所有置顶标签已放回顶部',
+    'notice.diagSaved': '诊断已写入 vault 根目录：_ptb-diag.md',
+    'notice.diagFailed': '写入诊断文件失败：{0}',
+    'notice.movedToSidebar': '已收进侧栏：{0}',
+    'notice.alreadyPinned': '这个标签已经是置顶状态了。',
+    'notice.pinUnsupported':
+      '当前 Obsidian 版本不支持通过插件置顶标签，请右键标签手动置顶。',
+    'notice.newWindowUnsupported': '当前版本不支持在新窗口打开。',
+    'notice.copied': '已复制：{0}',
+    'notice.unpinFailed':
+      '无法取消置顶。可以先把该标签改成「放回顶部」，再右键原标签操作。',
+    'notice.hideFailed':
+      '{0} 个置顶标签未能从顶部隐藏。可在命令面板运行「诊断」导出结构快照。',
+    'notice.welcome':
+      '置顶文件栏已启用：置顶标签现在有自己的独立栏。\n左键点击徽标跳转，右键徽标可换位置或取消置顶。',
+
+    'menu.toSidebar': '收进侧栏',
+    'menu.toTopFull': '放回顶部 · 完整显示',
+    'menu.toTopCompact': '放回顶部 · 收缩成小方块',
+    'menu.unpin': '取消置顶（变回普通标签）',
+    'menu.openRight': '在右侧分屏打开',
+    'menu.openWindow': '在新窗口打开',
+    'menu.copyPath': '复制文件路径',
+    'menu.close': '关闭此标签',
+    'menu.closeOthers': '关闭其他标签页（保留置顶）',
+
+    'settings.title': '置顶文件栏',
+    'settings.language.name': '语言',
+    'settings.language.desc':
+      '插件界面语言。选「跟随 Obsidian」会随 Obsidian 的语言自动切换。切换后设置面板立即生效，命令面板里的命令名需重新加载插件才会更新。',
+    'settings.language.auto': '跟随 Obsidian',
+    'settings.enable.name': '启用',
+    'settings.enable.desc': '关闭后立即恢复成 Obsidian 默认的顶部标签栏行为。',
+    'settings.position.name': '侧栏放在哪',
+    'settings.position.desc': '左侧缎带最不占用编辑区。',
+    'settings.position.leftTop': '左侧缎带 · 顶部',
+    'settings.position.leftBottom': '左侧缎带 · 底部（设置按钮上方）',
+    'settings.position.statusBar': '底部状态栏',
+    'settings.perTab.title': '每个置顶标签放在哪',
+    'settings.perTab.empty':
+      '当前没有置顶标签。在顶部标签栏右键某个标签选「置顶」，它就会出现在这里。',
+    'settings.perTab.sidebar': '收进侧栏（默认）',
+    'settings.perTab.compact': '顶部 · 收缩成小方块',
+    'settings.perTab.top': '顶部 · 完整显示',
+    'settings.badgeStyle.name': '图标形态',
+    'settings.badgeStyle.desc':
+      '「首字徽标」用文件名前几个字加专属配色，比文件类型图标更容易区分同类文件。',
+    'settings.badgeStyle.letter': '首字徽标（推荐）',
+    'settings.badgeStyle.icon': '文件类型图标',
+    'settings.badgeLength.name': '徽标字数',
+    'settings.badgeLength.desc':
+      '首字徽标显示文件名的前几个字符，建议 1~2。也可在单个文件的 frontmatter 里写 ptb-label 单独指定。',
+    'settings.badgeSize.name': '图标尺寸',
+    'settings.badgeSize.desc': '徽标方块里图标 / 文字区域的大小，单位 px。',
+    'settings.help.title': '用法',
+    'settings.help.line1':
+      '侧栏徽标：左键跳转并高亮；右键可换位置、取消置顶、右侧分屏、新窗口、复制路径、关闭。',
+    'settings.help.line2':
+      '顶部标签：双击它 → 直接收进侧栏。右键仍是 Obsidian 原生菜单。',
+    'settings.help.line3': '每个标签的位置互相独立，三种状态可以同时存在。',
+    'settings.help.line4':
+      '想让某个文件显示固定文字或颜色：在它的 frontmatter 写 ptb-label: N / ptb-color: 200。',
+  },
+
+  en: {
+    'cmd.refresh': 'Refresh pinned tab bar',
+    'cmd.toggle': 'Show or hide pinned tab bar',
+    'cmd.allToSidebar': 'Move all pinned tabs to sidebar',
+    'cmd.allToTop': 'Move all pinned tabs to top bar',
+    'cmd.pinCurrent': 'Pin current tab',
+    'cmd.diagnose': 'Diagnose: export layout snapshot to _ptb-diag.md',
+
+    'notice.allToSidebar': 'All pinned tabs moved to the sidebar.',
+    'notice.allToTop': 'All pinned tabs moved to the top bar.',
+    'notice.diagSaved': 'Diagnostics written to _ptb-diag.md in the vault root.',
+    'notice.diagFailed': 'Failed to write diagnostics: {0}',
+    'notice.movedToSidebar': 'Moved to sidebar: {0}',
+    'notice.alreadyPinned': 'This tab is already pinned.',
+    'notice.pinUnsupported':
+      'This Obsidian version does not allow pinning through a plugin. Pin the tab from its context menu instead.',
+    'notice.newWindowUnsupported':
+      'Opening in a new window is not supported in this version.',
+    'notice.copied': 'Copied: {0}',
+    'notice.unpinFailed':
+      'Could not unpin. Move this tab back to the top bar first, then use its context menu.',
+    'notice.hideFailed':
+      '{0} pinned tab(s) could not be hidden from the tab header. Run the diagnose command for a layout snapshot.',
+    'notice.welcome':
+      'Pinned Tab Bar is enabled: pinned tabs now live in their own strip.\nClick a badge to jump to the file; right-click it for more actions.',
+
+    'menu.toSidebar': 'Move to sidebar',
+    'menu.toTopFull': 'Move to top bar (full title)',
+    'menu.toTopCompact': 'Move to top bar (compact badge)',
+    'menu.unpin': 'Unpin (back to normal tab)',
+    'menu.openRight': 'Open in split to the right',
+    'menu.openWindow': 'Open in new window',
+    'menu.copyPath': 'Copy file path',
+    'menu.close': 'Close this tab',
+    'menu.closeOthers': 'Close other tabs (keep pinned)',
+
+    'settings.title': 'Pinned Tab Bar',
+    'settings.language.name': 'Language',
+    'settings.language.desc':
+      'Language of the plugin interface. Follow Obsidian switches automatically with the app language. The settings panel updates immediately; command names update after reloading the plugin.',
+    'settings.language.auto': 'Follow Obsidian',
+    'settings.enable.name': 'Enable',
+    'settings.enable.desc':
+      'Turning this off restores the stock tab header behaviour immediately.',
+    'settings.position.name': 'Sidebar location',
+    'settings.position.desc':
+      'The left ribbon takes the least space from the editor.',
+    'settings.position.leftTop': 'Left ribbon, top',
+    'settings.position.leftBottom': 'Left ribbon, bottom (above settings)',
+    'settings.position.statusBar': 'Status bar',
+    'settings.perTab.title': 'Placement of each pinned tab',
+    'settings.perTab.empty':
+      'No pinned tabs yet. Pin a tab from its context menu and it will show up here.',
+    'settings.perTab.sidebar': 'Sidebar (default)',
+    'settings.perTab.compact': 'Top bar, compact badge',
+    'settings.perTab.top': 'Top bar, full title',
+    'settings.badgeStyle.name': 'Badge style',
+    'settings.badgeStyle.desc':
+      'Leading characters add a per-file color, which distinguishes several Markdown files that would otherwise share the same icon.',
+    'settings.badgeStyle.letter': 'Leading characters (recommended)',
+    'settings.badgeStyle.icon': 'File type icon',
+    'settings.badgeLength.name': 'Badge length',
+    'settings.badgeLength.desc':
+      'How many leading characters to show, 1 to 4. Override per file with ptb-label in frontmatter.',
+    'settings.badgeSize.name': 'Badge size',
+    'settings.badgeSize.desc':
+      'Size of the icon or text area inside the badge, in pixels.',
+    'settings.help.title': 'Usage',
+    'settings.help.line1':
+      'Sidebar badge: left click jumps to the file and highlights the badge; right click opens placement, unpin, split, new window, copy path, close.',
+    'settings.help.line2':
+      'Top bar: pinned tabs stay where they are; double-click one to send it back to the sidebar. Right click keeps Obsidian own menu.',
+    'settings.help.line3':
+      'Each tab has its own placement, so the three states can coexist.',
+    'settings.help.line4':
+      'To fix the look of one file, add ptb-label: N or ptb-color: 200 to its frontmatter.',
+  },
+};
+
+function detectLang() {
+  let raw = '';
+  try {
+    if (window.localStorage) raw = window.localStorage.getItem('language') || '';
+  } catch (e) {
+    raw = '';
+  }
+  if (!raw) {
+    try {
+      if (window.moment && typeof window.moment.locale === 'function') {
+        raw = window.moment.locale() || '';
+      }
+    } catch (e) {
+      raw = '';
+    }
+  }
+  if (!raw) raw = navigator.language || 'en';
+  return String(raw).toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en';
+}
 
 // 稳定的色相调色板：按路径 hash 取，同一个文件永远同一个颜色
 const HUE_PALETTE = [205, 268, 152, 22, 335, 188, 48, 118, 288, 8, 172, 240];
@@ -99,13 +275,13 @@ class PinnedTabBar extends Plugin {
 
     this.addCommand({
       id: 'refresh-pinned-bar',
-      name: '刷新置顶文件栏',
+      name: this.t('cmd.refresh'),
       callback: () => this.refresh(true),
     });
 
     this.addCommand({
       id: 'toggle-pinned-bar',
-      name: '显示/隐藏置顶文件栏',
+      name: this.t('cmd.toggle'),
       callback: async () => {
         this.settings.enabled = !this.settings.enabled;
         await this.saveSettings();
@@ -115,18 +291,18 @@ class PinnedTabBar extends Plugin {
 
     this.addCommand({
       id: 'all-to-sidebar',
-      name: '全部置顶标签收进侧栏',
+      name: this.t('cmd.allToSidebar'),
       callback: async () => {
         this.settings.placementMap = {};
         await this.saveSettings();
         this.refresh(true);
-        new Notice('所有置顶标签已收进侧栏');
+        new Notice(this.t('notice.allToSidebar'));
       },
     });
 
     this.addCommand({
       id: 'all-to-top',
-      name: '全部置顶标签放回顶部',
+      name: this.t('cmd.allToTop'),
       callback: async () => {
         const map = {};
         for (const item of this.collectPinnedItems()) {
@@ -135,13 +311,13 @@ class PinnedTabBar extends Plugin {
         this.settings.placementMap = map;
         await this.saveSettings();
         this.refresh(true);
-        new Notice('所有置顶标签已放回顶部');
+        new Notice(this.t('notice.allToTop'));
       },
     });
 
     this.addCommand({
       id: 'pin-current-tab',
-      name: '把当前标签置顶',
+      name: this.t('cmd.pinCurrent'),
       checkCallback: (checking) => {
         const leaf =
           this.app.workspace.activeLeaf ||
@@ -155,7 +331,7 @@ class PinnedTabBar extends Plugin {
 
     this.addCommand({
       id: 'diagnose',
-      name: '诊断：导出结构与状态到 _ptb-diag.md',
+      name: this.t('cmd.diagnose'),
       callback: () => {
         this.refresh(true);
         this.exportDiagnostics();
@@ -201,10 +377,7 @@ class PinnedTabBar extends Plugin {
       if (!this.settings.seenIntro) {
         this.settings.seenIntro = true;
         this.saveSettings();
-        new Notice(
-          '置顶文件栏已启用：原先的置顶标签收进了独立图标栏。\n左键点击徽标跳转，右键徽标可取消置顶。',
-          9000
-        );
+        new Notice(this.t('notice.welcome'), 9000);
       }
     });
   }
@@ -238,6 +411,25 @@ class PinnedTabBar extends Plugin {
     // 清掉历史版本遗留的全局模式字段（已改为逐个标签控制）
     delete this.settings.placement;
     delete this.settings.hideOriginal;
+  }
+
+  // 当前生效的界面语言
+  resolvedLang() {
+    const pref = this.settings.language || 'auto';
+    if (pref === 'zh' || pref === 'en') return pref;
+    return detectLang();
+  }
+
+  // 取一条界面文案，支持 {0} {1} 占位
+  t(key, ...args) {
+    const dict = STRINGS[this.resolvedLang()] || STRINGS.en;
+    let s = dict[key];
+    if (s === undefined) s = STRINGS.en[key];
+    if (s === undefined) s = STRINGS.zh[key];
+    if (s === undefined) return key;
+    return s.replace(/\{(\d+)\}/g, (m, i) =>
+      args[i] === undefined ? m : String(args[i])
+    );
   }
 
   // 某个置顶标签当前放在哪：没有记录就是侧栏
@@ -577,11 +769,11 @@ class PinnedTabBar extends Plugin {
     const lines = [];
     const push = (s) => lines.push(s);
 
-    push('# Pinned Tab Bar 诊断');
+    push('# Pinned Tab Bar diagnostics');
     push('');
-    push('生成时间：' + new Date().toLocaleString());
+    push('Generated: ' + new Date().toLocaleString());
     push('');
-    push('## 设置');
+    push('## Settings');
     push('```json');
     push(JSON.stringify(this.settings, null, 2));
     push('```');
@@ -600,7 +792,7 @@ class PinnedTabBar extends Plugin {
     document.body.appendChild(probe);
     const cs = getComputedStyle(probe);
     push('');
-    push('## styles.css 生效检测（.ptb-item 计算样式）');
+    push('## Stylesheet check (.ptb-item computed style)');
     push('```');
     push('width: ' + cs.width);
     push('height: ' + cs.height);
@@ -608,16 +800,18 @@ class PinnedTabBar extends Plugin {
     push('background-color: ' + cs.backgroundColor);
     push('cursor: ' + cs.cursor);
     push('```');
-    push('判断：width 约 30px = CSS 已加载；width 很大或 auto = CSS 没加载');
+    push(
+      'Expect width around 30px when styles.css is loaded; auto or a very large value means it is not.'
+    );
     probe.remove();
 
     push('');
-    push('## 识别到的置顶标签（共 ' + this.pinnedItems.length + ' 个）');
+    push('## Detected pinned tabs (' + this.pinnedItems.length + ')');
     this.pinnedItems.forEach((item, i) => {
       push('');
       push('### ' + (i + 1) + '. ' + item.title);
-      push('- path: ' + (item.path || '(无)'));
-      push('- 独立栏元素: ' + (item.btnEl ? '已渲染' : '未渲染'));
+      push('- path: ' + (item.path || '(none)'));
+      push('- sidebar badge: ' + (item.btnEl ? 'rendered' : 'missing'));
 
       const header =
         item.header && item.header.isConnected
@@ -625,11 +819,11 @@ class PinnedTabBar extends Plugin {
           : this.getHeaderForLeaf(item.leaf);
 
       if (!header) {
-        push('- 顶部 header: **未找到**');
+        push('- tab header: **not found**');
       } else {
-        push('- 顶部 header: 已找到');
+        push('- tab header: found');
         push('  - className: `' + header.className + '`');
-        push('  - 标题: ' + this.getHeaderTitle(header));
+        push('  - title: ' + this.getHeaderTitle(header));
         push('  - display: ' + getComputedStyle(header).display);
       }
 
@@ -649,14 +843,14 @@ class PinnedTabBar extends Plugin {
           n = n.parentElement;
           d++;
         }
-        push('- 向上层级: ' + chain.join(' < '));
+        push('- ancestor chain: ' + chain.join(' < '));
       }
     });
 
     push('');
-    push('## 页面上所有 .workspace-tab-header');
+    push('## All .workspace-tab-header');
     const all = Array.from(document.querySelectorAll('.workspace-tab-header'));
-    push('共 ' + all.length + ' 个');
+    push('count: ' + all.length);
     all.forEach((h, i) => {
       push(
         i +
@@ -681,9 +875,12 @@ class PinnedTabBar extends Plugin {
 
     try {
       await this.app.vault.adapter.write('_ptb-diag.md', lines.join('\n'));
-      new Notice('诊断已写入 vault 根目录：_ptb-diag.md', 6000);
+      new Notice(this.t('notice.diagSaved'), 6000);
     } catch (e) {
-      new Notice('写入诊断文件失败：' + (e && e.message ? e.message : e), 8000);
+      new Notice(
+        this.t('notice.diagFailed', e && e.message ? e.message : e),
+        8000
+      );
     }
   }
 
@@ -825,9 +1022,9 @@ class PinnedTabBar extends Plugin {
         const title = item.title || '标签';
         const p = this.setPlacementOf(item.path, 'sidebar');
         if (p && typeof p.then === 'function') {
-          p.then(() => new Notice('已收进侧栏：' + title, 2200));
+          p.then(() => new Notice(this.t('notice.movedToSidebar', title), 2200));
         } else {
-          new Notice('已收进侧栏：' + title, 2200);
+          new Notice(this.t('notice.movedToSidebar', title), 2200);
         }
       },
       true
@@ -898,8 +1095,7 @@ class PinnedTabBar extends Plugin {
     // 不落盘、不发网络，只提示一次。
     // 插件不应该在 vault 里悄悄生成文件，诊断快照只在用户主动执行命令时才写。
     new Notice(
-      `Pinned Tab Bar: ${shouldHide.length - hidden} 个置顶标签未能从顶部隐藏。` +
-        '可在命令面板运行「诊断」导出结构快照。',
+      'Pinned Tab Bar: ' + this.t('notice.hideFailed', shouldHide.length - hidden),
       8000
     );
   }
@@ -1046,7 +1242,7 @@ class PinnedTabBar extends Plugin {
       state = null;
     }
     if (state && state.pinned) {
-      new Notice('这个标签已经是置顶状态了。');
+      new Notice(this.t('notice.alreadyPinned'));
       return;
     }
 
@@ -1078,7 +1274,7 @@ class PinnedTabBar extends Plugin {
       }
     }
     if (!done) {
-      new Notice('当前 Obsidian 版本不支持通过插件置顶标签，请右键标签手动置顶。');
+      new Notice(this.t('notice.pinUnsupported'));
     }
     this.scheduleRefresh();
   }
@@ -1127,9 +1323,7 @@ class PinnedTabBar extends Plugin {
     }
 
     if (!done) {
-      new Notice(
-        '无法取消置顶。可以先去设置面板把这个标签改成「放回顶部」，再右键原标签操作。'
-      );
+      new Notice(this.t('notice.unpinFailed'));
       return;
     }
 
@@ -1147,7 +1341,7 @@ class PinnedTabBar extends Plugin {
 
     menu.addItem((i) =>
       i
-        .setTitle('收进侧栏')
+        .setTitle(this.t('menu.toSidebar'))
         .setIcon('panel-left')
         .setChecked(mode === 'sidebar')
         .onClick(() => this.setPlacementOf(item.path, 'sidebar'))
@@ -1155,7 +1349,7 @@ class PinnedTabBar extends Plugin {
 
     menu.addItem((i) =>
       i
-        .setTitle('放回顶部 · 完整显示')
+        .setTitle(this.t('menu.toTopFull'))
         .setIcon('panel-top')
         .setChecked(mode === 'top')
         .onClick(() => this.setPlacementOf(item.path, 'top'))
@@ -1163,7 +1357,7 @@ class PinnedTabBar extends Plugin {
 
     menu.addItem((i) =>
       i
-        .setTitle('放回顶部 · 收缩成小方块')
+        .setTitle(this.t('menu.toTopCompact'))
         .setIcon('shrink')
         .setChecked(mode === 'compact')
         .onClick(() => this.setPlacementOf(item.path, 'compact'))
@@ -1173,7 +1367,7 @@ class PinnedTabBar extends Plugin {
 
     menu.addItem((i) =>
       i
-        .setTitle('取消置顶（变回普通标签）')
+        .setTitle(this.t('menu.unpin'))
         .setIcon('pin-off')
         .onClick(() => this.unpinItem(item))
     );
@@ -1183,7 +1377,7 @@ class PinnedTabBar extends Plugin {
     if (file instanceof TFile) {
       menu.addItem((i) =>
         i
-          .setTitle('在右侧分屏打开')
+          .setTitle(this.t('menu.openRight'))
           .setIcon('separator-vertical')
           .onClick(async () => {
             const leaf = this.app.workspace.getLeaf('split', 'vertical');
@@ -1193,14 +1387,14 @@ class PinnedTabBar extends Plugin {
 
       menu.addItem((i) =>
         i
-          .setTitle('在新窗口打开')
+          .setTitle(this.t('menu.openWindow'))
           .setIcon('picture-in-picture-2')
           .onClick(async () => {
             try {
               const leaf = this.app.workspace.getLeaf('window');
               await leaf.openFile(file);
             } catch (e) {
-              new Notice('当前版本不支持在新窗口打开。');
+              new Notice(this.t('notice.newWindowUnsupported'));
             }
           })
       );
@@ -1208,11 +1402,11 @@ class PinnedTabBar extends Plugin {
       if (item.path) {
         menu.addItem((i) =>
           i
-            .setTitle('复制文件路径')
+            .setTitle(this.t('menu.copyPath'))
             .setIcon('copy')
             .onClick(async () => {
               await navigator.clipboard.writeText(item.path);
-              new Notice('已复制：' + item.path);
+              new Notice(this.t('notice.copied', item.path));
             })
         );
       }
@@ -1222,7 +1416,7 @@ class PinnedTabBar extends Plugin {
 
     menu.addItem((i) =>
       i
-        .setTitle('关闭此标签')
+        .setTitle(this.t('menu.close'))
         .setIcon('x')
         .onClick(() => {
           try {
@@ -1236,7 +1430,7 @@ class PinnedTabBar extends Plugin {
 
     menu.addItem((i) =>
       i
-        .setTitle('关闭其他标签页（保留置顶）')
+        .setTitle(this.t('menu.closeOthers'))
         .setIcon('x-circle')
         .onClick(() => {
           const parent = item.leaf.parent;
@@ -1275,61 +1469,78 @@ class PinnedTabBarSettingTab extends PluginSettingTab {
 
   display() {
     const { containerEl } = this;
+    const p = this.plugin;
+    const t = (key, ...a) => p.t(key, ...a);
+
     containerEl.empty();
 
-    containerEl.createEl('h2', { text: '置顶文件栏' });
+    containerEl.createEl('h2', { text: t('settings.title') });
+
+    // 第一栏：语言
+    new Setting(containerEl)
+      .setName(t('settings.language.name'))
+      .setDesc(t('settings.language.desc'))
+      .addDropdown((d) =>
+        d
+          .addOption('auto', t('settings.language.auto'))
+          .addOption('zh', '中文')
+          .addOption('en', 'English')
+          .setValue(p.settings.language || 'auto')
+          .onChange(async (v) => {
+            p.settings.language = v;
+            await p.saveSettings();
+            p.refresh(true);
+            this.display(); // 面板立刻换成新语言
+          })
+      );
 
     new Setting(containerEl)
-      .setName('启用')
-      .setDesc('关闭后立即恢复成 Obsidian 默认的顶部标签栏行为。')
-      .addToggle((t) =>
-        t.setValue(this.plugin.settings.enabled).onChange(async (v) => {
-          this.plugin.settings.enabled = v;
-          await this.plugin.saveSettings();
-          this.plugin.refresh(true);
+      .setName(t('settings.enable.name'))
+      .setDesc(t('settings.enable.desc'))
+      .addToggle((tg) =>
+        tg.setValue(p.settings.enabled).onChange(async (v) => {
+          p.settings.enabled = v;
+          await p.saveSettings();
+          p.refresh(true);
         })
       );
 
     new Setting(containerEl)
-      .setName('侧栏放在哪')
-      .setDesc('左侧缎带最不占用编辑区。')
+      .setName(t('settings.position.name'))
+      .setDesc(t('settings.position.desc'))
       .addDropdown((d) =>
         d
-          .addOption('left-top', '左侧缎带 · 顶部')
-          .addOption('left-bottom', '左侧缎带 · 底部（设置按钮上方）')
-          .addOption('status-bar', '底部状态栏')
-          .setValue(this.plugin.settings.position)
+          .addOption('left-top', t('settings.position.leftTop'))
+          .addOption('left-bottom', t('settings.position.leftBottom'))
+          .addOption('status-bar', t('settings.position.statusBar'))
+          .setValue(p.settings.position)
           .onChange(async (v) => {
-            this.plugin.settings.position = v;
-            await this.plugin.saveSettings();
-            this.plugin.refresh(true);
+            p.settings.position = v;
+            await p.saveSettings();
+            p.refresh(true);
           })
       );
 
     // 让下面的列表拿到当前最新的置顶标签
-    this.plugin.pinnedItems = this.plugin.settings.enabled
-      ? this.plugin.collectPinnedItems()
-      : [];
+    p.pinnedItems = p.settings.enabled ? p.collectPinnedItems() : [];
 
-    containerEl.createEl('h3', { text: '每个置顶标签放在哪' });
+    containerEl.createEl('h3', { text: t('settings.perTab.title') });
 
-    if (this.plugin.pinnedItems.length === 0) {
+    if (p.pinnedItems.length === 0) {
       const empty = containerEl.createEl('div', { cls: 'ptb-settings-tip' });
-      empty.createEl('p', {
-        text: '当前没有置顶标签。在顶部标签栏右键某个标签选「置顶」，它就会出现在这里。',
-      });
+      empty.createEl('p', { text: t('settings.perTab.empty') });
     } else {
-      for (const item of this.plugin.pinnedItems) {
+      for (const item of p.pinnedItems) {
         const row = new Setting(containerEl).setName(item.title);
         if (item.path) row.setDesc(item.path);
         row.addDropdown((d) =>
           d
-            .addOption('sidebar', '收进侧栏（默认）')
-            .addOption('compact', '顶部 · 收缩成小方块')
-            .addOption('top', '顶部 · 完整显示')
-            .setValue(this.plugin.getPlacementOf(item.path))
+            .addOption('sidebar', t('settings.perTab.sidebar'))
+            .addOption('compact', t('settings.perTab.compact'))
+            .addOption('top', t('settings.perTab.top'))
+            .setValue(p.getPlacementOf(item.path))
             .onChange(async (v) => {
-              await this.plugin.setPlacementOf(item.path, v);
+              await p.setPlacementOf(item.path, v);
               this.display();
             })
         );
@@ -1337,59 +1548,57 @@ class PinnedTabBarSettingTab extends PluginSettingTab {
     }
 
     new Setting(containerEl)
-      .setName('图标形态')
-      .setDesc(
-        '仅「侧栏」模式生效；「顶部·收缩」固定用首字徽标。「首字徽标」用文件名前几个字加专属配色，比文件类型图标更容易区分同类文件。'
-      )
+      .setName(t('settings.badgeStyle.name'))
+      .setDesc(t('settings.badgeStyle.desc'))
       .addDropdown((d) =>
         d
-          .addOption('letter', '首字徽标（推荐）')
-          .addOption('icon', '文件类型图标')
-          .setValue(this.plugin.settings.displayMode)
+          .addOption('letter', t('settings.badgeStyle.letter'))
+          .addOption('icon', t('settings.badgeStyle.icon'))
+          .setValue(p.settings.displayMode)
           .onChange(async (v) => {
-            this.plugin.settings.displayMode = v;
-            await this.plugin.saveSettings();
-            this.plugin.refresh(true);
+            p.settings.displayMode = v;
+            await p.saveSettings();
+            p.refresh(true);
           })
       );
 
     new Setting(containerEl)
-      .setName('徽标字数')
-      .setDesc('首字徽标显示 filename 的前几个字符，建议 1~2。也可在单个文件的 frontmatter 里写 ptb-label 单独指定。')
+      .setName(t('settings.badgeLength.name'))
+      .setDesc(t('settings.badgeLength.desc'))
       .addSlider((s) =>
         s
           .setLimits(1, 4, 1)
-          .setValue(this.plugin.settings.labelLength)
+          .setValue(p.settings.labelLength)
           .setDynamicTooltip()
           .onChange(async (v) => {
-            this.plugin.settings.labelLength = v;
-            await this.plugin.saveSettings();
-            this.plugin.refresh(true);
+            p.settings.labelLength = v;
+            await p.saveSettings();
+            p.refresh(true);
           })
       );
 
     new Setting(containerEl)
-      .setName('图标尺寸')
-      .setDesc('徽标方块里图标 / 文字区域的大小，单位 px。')
+      .setName(t('settings.badgeSize.name'))
+      .setDesc(t('settings.badgeSize.desc'))
       .addSlider((s) =>
         s
           .setLimits(12, 26, 1)
-          .setValue(this.plugin.settings.iconSize)
+          .setValue(p.settings.iconSize)
           .setDynamicTooltip()
           .onChange(async (v) => {
-            this.plugin.settings.iconSize = v;
-            await this.plugin.saveSettings();
-            this.plugin.refresh(true);
+            p.settings.iconSize = v;
+            await p.saveSettings();
+            p.refresh(true);
           })
       );
 
     const tip = containerEl.createEl('div', { cls: 'ptb-settings-tip' });
-    tip.createEl('p', { text: '用法：' });
+    tip.createEl('p', { text: t('settings.help.title') });
     const ul = tip.createEl('ul');
-    ul.createEl('li', { text: '侧栏模式：左键点击徽标 → 跳到该文件，徽标高亮；右键徽标 → 取消置顶 / 右侧分屏 / 新窗口 / 复制路径 / 关闭。' });
-    ul.createEl('li', { text: '顶部收缩模式：置顶标签留在顶部栏，只占约 44px，悬停显示完整文件名；点击即切换。' });
-    ul.createEl('li', { text: '三种位置可以随时换：命令面板执行「切换置顶标签位置」，一次循环一种。' });
-    ul.createEl('li', { text: '想让某个文件显示固定文字或颜色：在它的 frontmatter 写 ptb-label: 数 / ptb-color: 200。' });
+    ul.createEl('li', { text: t('settings.help.line1') });
+    ul.createEl('li', { text: t('settings.help.line2') });
+    ul.createEl('li', { text: t('settings.help.line3') });
+    ul.createEl('li', { text: t('settings.help.line4') });
   }
 }
 

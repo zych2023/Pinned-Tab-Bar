@@ -63,6 +63,7 @@ So four pinned files can be split any way you like — two in the sidebar, one f
 
 | Setting | Description |
 | --- | --- |
+| Language | Interface language: follow Obsidian, Chinese, or English. |
 | Enable | Master switch. Disabling restores stock Obsidian behaviour immediately. |
 | Sidebar location | Top of the left ribbon (default) / bottom of the left ribbon / status bar. |
 | Placement per pinned tab | One row per pinned file, each with its own placement dropdown. |
