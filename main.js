@@ -895,9 +895,13 @@ class PinnedTabBar extends Plugin {
     if (hidden === shouldHide.length) return;
 
     this._diagDone = true;
-    window.setTimeout(() => {
-      this.exportDiagnostics();
-    }, 900);
+    // 不落盘、不发网络，只提示一次。
+    // 插件不应该在 vault 里悄悄生成文件，诊断快照只在用户主动执行命令时才写。
+    new Notice(
+      `Pinned Tab Bar: ${shouldHide.length - hidden} 个置顶标签未能从顶部隐藏。` +
+        '可在命令面板运行「诊断」导出结构快照。',
+      8000
+    );
   }
 
   renderBar(force) {

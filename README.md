@@ -1,78 +1,107 @@
 # Pinned Tab Bar
 
-把 Obsidian 的置顶（pinned）标签页从顶部标签栏剥离出来，默认收进一条独立窄栏，并且**逐个标签**可放回顶部。
+An Obsidian plugin that moves pinned tabs out of the tab header and into a dedicated sidebar strip, so the tab bar keeps its horizontal space for the files you actually switch between.
 
-## 效果
+Nothing is unpinned. The plugin only changes *where* a pinned tab is displayed, never *whether* it is pinned.
 
-默认状态：所有置顶标签都在左侧侧栏，顶部标签栏只剩普通标签。
+## Features
 
-位置是**按单个标签**记录的，不是全局开关。右键侧栏里的任意一个方块，就能单独改它：
+- **Frees the tab header.** Pinned files stop eating tab-bar width.
+- **Per-tab placement.** Each pinned file is configured on its own, not by a global switch:
+  - keep it in the sidebar strip,
+  - send it back to the tab bar with its full title, or
+  - send it back to the tab bar as a compact badge.
+- **Distinguishable at a glance.** Badges show the leading characters of the file name plus a color derived from its path, because several Markdown files would otherwise share the same file-type icon.
+- **Local only.** No network requests, no telemetry.
 
-| 位置 | 表现 |
+## Installation
+
+### Community directory
+
+Settings → Community plugins → Browse → search for **Pinned Tab Bar**.
+
+### Manual
+
+1. Download `manifest.json`, `main.js`, and `styles.css` from the latest release.
+2. Put them into `<vault>/.obsidian/plugins/pinned-tab-bar/`.
+3. Reload Obsidian, then enable the plugin under Settings → Community plugins.
+
+### BRAT
+
+Command palette → `BRAT: Add a beta plugin for testing` → enter `zych2023/Pinned-Tab-Bar`.
+
+## Usage
+
+Each pinned tab has its own placement, recorded per file:
+
+| Placement | Behaviour |
 | --- | --- |
-| **收进侧栏**（默认） | 顶部不占位，左侧显示一枚首字方块 |
-| **放回顶部 · 完整显示** | 回到顶部标签栏，显示完整标题，**仍然处于置顶状态** |
-| **放回顶部 · 收缩成小方块** | 回到顶部标签栏，但压成 44px，只显示首字徽标 |
+| **Sidebar** (default) | Hidden from the tab header, shown as a badge in the sidebar strip. |
+| **Top, full** | Stays in the tab header with its complete title. Still pinned. |
+| **Top, compact** | Stays in the tab header, squeezed to about 44 px, showing only the badge. Still pinned. |
 
-所以 4 个置顶文件可以这样混搭：2 个在侧栏、1 个完整显示在顶部、1 个收缩在顶部。每种状态互不影响。
+So four pinned files can be split any way you like — two in the sidebar, one full in the tab bar, one compact — at the same time.
 
-## 安装
+### Gestures
 
-需要 Obsidian 1.4.0 或更高版本。
+| Target | Action | Result |
+| --- | --- | --- |
+| Sidebar badge | Left click | Jump to that file; the badge highlights. |
+| Sidebar badge | Right click | Placement, unpin, split, open in new window, copy path, close. |
+| Tab-bar pinned tab | Double click | Send it back to the sidebar. |
+| Tab-bar pinned tab | Right click | Obsidian's own menu, untouched by this plugin. |
 
-### 手动安装
+### Commands
 
-1. 下载本仓库的 `manifest.json`、`main.js`、`styles.css` 三个文件；
-2. 放进你的 vault 下的 `.obsidian/plugins/pinned-tab-bar/` 目录；
-3. 重启 Obsidian，在 设置 → 第三方插件 里启用 **Pinned Tab Bar**。
+- **Refresh pinned bar**
+- **Pin current tab**
+- **All pinned tabs to sidebar**
+- **All pinned tabs to top bar**
+- **Diagnose and export layout snapshot** (writes `_ptb-diag.md` to the vault root, only when you run it)
 
-### 用 BRAT 安装
+## Settings
 
-1. 安装并启用 BRAT；
-2. 命令面板执行 `BRAT: Add a beta plugin for testing`；
-3. 填入 `zych2023/Pinned-Tab-Bar`。
-
-## 设置项
-
-| 项 | 说明 |
+| Setting | Description |
 | --- | --- |
-| 启用 | 总开关，关掉立即恢复 Obsidian 原生行为 |
-| 侧栏放在哪 | 左侧缎带顶部（默认）/ 左侧缎带底部 / 底部状态栏 |
-| 每个置顶标签放在哪 | 逐个列出当前所有置顶文件，各自选三态之一 |
-| 图标形态 | 侧栏里用首字徽标还是文件类型图标 |
-| 徽标字数 | 1~4，默认 2 |
-| 图标尺寸 | 徽标方块内图标区域的 px |
+| Enable | Master switch. Disabling restores stock Obsidian behaviour immediately. |
+| Sidebar location | Top of the left ribbon (default) / bottom of the left ribbon / status bar. |
+| Placement per pinned tab | One row per pinned file, each with its own placement dropdown. |
+| Badge style | Leading characters (recommended) or file-type icon. |
+| Badge length | 1–4 characters, default 2. |
+| Badge size | Size of the badge glyph in pixels. |
 
-## 怎么用
+## Customizing a badge
 
-- **右键侧栏方块** → 收进侧栏 / 放回顶部完整显示 / 放回顶部收缩 / 取消置顶 / 右侧分屏 / 新窗口 / 复制路径 / 关闭。
-- **双击顶部那个置顶标签** → 直接收进侧栏，不用进菜单。
-- **右键顶部那个置顶标签** → 保持 Obsidian 原生菜单，插件不接管。
-- **设置面板的列表**：不想用右键也行，直接在下拉里改任何一个标签的位置。
-- **批量命令**（命令面板）：`全部置顶标签收进侧栏`、`全部置顶标签放回顶部`。
-
-> 注：双击收侧栏会吃掉顶部的「双击标题重命名」。要给置顶标签改名，可用原生右键菜单里的重命名，或先把「徽标字数」当显示别名用。
-
-## 怎么让徽标更好认
-
-默认取文件名前 2 个字 + 按文件名分配的颜色。想固定某个文件的外观，在它的 frontmatter 里写：
+Add two optional keys to a file's frontmatter:
 
 ```yaml
 ---
-ptb-label: 数        # 徽标上显示的文字
-ptb-color: 200       # 色相 0~360，200 偏蓝，120 偏绿，0 偏红
+ptb-label: N     # text shown on the badge, overrides the file name
+ptb-color: 200   # hue 0–360; 200 blue, 120 green, 0 red
 ---
 ```
 
-## 排错
+## How it works
 
-- **顶部标签没按预期隐藏**：命令面板运行「诊断：导出结构与状态到 _ptb-diag.md」，然后把该文件内容发出来。
-- **独立栏没出现**：确认左侧缎带没被折叠（设置 → 外观 → 显示左侧缎带）；另外如果所有置顶标签都被放回了顶部，侧栏本来就是空的。
-- **点击方块没反应**：多半是 Obsidian 重绘了标签组，命令面板执行「刷新置顶文件栏」。
+- Pinned state is read from the public `ViewState.pinned` field and changed with `WorkspaceLeaf.setPinned()`.
+- The tab header belonging to a leaf is resolved through `leaf.parent.tabHeaderEls`, the same index mapping Obsidian itself uses when a tab is clicked.
+- Placements are stored as `placementMap: { "relative/path.md": "sidebar" | "compact" | "top" }` and follow the file when it is renamed.
 
-## 实现要点
+## Privacy
 
-- 置顶判定用官方 `ViewState.pinned`，置顶/取消置顶用 `leaf.setPinned()`。
-- header 定位优先走 `leaf.parent.tabHeaderEls[leaf.parent.children.indexOf(leaf)]`——Obsidian 自己处理标签点击用的就是这个映射。
-- 位置记录存 `placementMap: { "相对路径.md": "sidebar" | "compact" | "top" }`，文件改名时自动跟着搬。
-- 文件名哈希取色会撞（实测三个中文文件名有两个同色），所以按顺序做撞色避让，保证同栏颜色互不相同。
+- No network requests of any kind.
+- No analytics, telemetry, or crash reporting.
+- File contents are never read. The plugin only looks at file names and paths, and only for pinned tabs.
+- The single file it writes is its own settings file: `.obsidian/plugins/pinned-tab-bar/data.json`.
+
+## Troubleshooting
+
+**A pinned tab is not hidden from the tab header.** Run the diagnose command and open `_ptb-diag.md`, or disable and re-enable the plugin to force a refresh.
+
+**The sidebar strip does not appear.** Check that the left ribbon is not collapsed (Settings → Appearance → Show left ribbon). If every pinned tab has been sent to the top, the strip is empty by design.
+
+**Double-clicking a pinned tab no longer renames it.** Reclaiming that gesture is what makes "double-click to send back" possible. Use the right-click menu to rename instead.
+
+## License
+
+[MIT](LICENSE)
