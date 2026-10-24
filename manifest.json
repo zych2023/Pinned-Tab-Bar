@@ -1,7 +1,7 @@
 {
   "id": "pinned-tab-bar",
   "name": "Pinned Tab Bar",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "minAppVersion": "1.4.0",
   "description": "Move pinned tabs into a separate sidebar strip and control each one independently: keep it in the strip, send it back to the tab bar, or shrink it to a small badge.",
   "author": "zych2023",

@@ -47,7 +47,7 @@ So four pinned files can be split any way you like — two in the sidebar, one f
 | Target | Action | Result |
 | --- | --- | --- |
 | Sidebar badge | Left click | Jump to that file; the badge highlights. |
-| Sidebar badge | Right click | Placement, unpin, split, open in new window, copy path, close. |
+| Sidebar badge | Right click | Placement, unpin, split, open in new window, close. |
 | Tab-bar pinned tab | Double click | Send it back to the sidebar. |
 | Tab-bar pinned tab | Right click | Obsidian's own menu, untouched by this plugin. |
 
@@ -92,6 +92,7 @@ ptb-color: 200   # hue 0–360; 200 blue, 120 green, 0 red
 
 - No network requests of any kind.
 - No analytics, telemetry, or crash reporting.
+- No clipboard access.
 - File contents are never read. The plugin only looks at file names and paths, and only for pinned tabs.
 - The single file it writes is its own settings file: `.obsidian/plugins/pinned-tab-bar/data.json`.
 

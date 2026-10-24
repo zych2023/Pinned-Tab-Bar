@@ -5,43 +5,65 @@
 
 /* ---------- 顶部标签栏：逐个标签按各自状态处理 ---------- */
 
+/*
+ * 这里靠「提高选择器特异性」压过 Obsidian 自身的规则，原则上不使用强制覆盖标记。
+ * 只有宽度必须保留，因为 Obsidian 在拖拽调整标签宽度时会把宽度写成元素内联样式，
+ * 内联样式优先级高于任何选择器，只能强制覆盖。
+ */
+
 /* 状态一：收进侧栏 —— 从顶部标签栏隐藏 */
-body.ptb-on .workspace-tab-header.ptb-hide-tab {
-  display: none !important;
+body.ptb-on .workspace-tabs .workspace-tab-header.ptb-hide-tab {
+  display: none;
 }
 
 /* 整组标签都收进侧栏时，连那条空白 header 带一起收掉 */
 body.ptb-on .workspace-tabs.ptb-all-hidden > .workspace-tab-header-container {
-  display: none !important;
+  display: none;
 }
 
 /* 隐藏后不留多余的分隔条 */
-body.ptb-on .workspace-tab-header.ptb-hide-tab + .workspace-tab-header {
+body.ptb-on
+  .workspace-tabs
+  .workspace-tab-header.ptb-hide-tab
+  + .workspace-tab-header {
   border-left: none;
 }
 
 /* 状态二：放回顶部但收缩 —— 压成 44px 的小方块 */
-body.ptb-on .workspace-tab-header.ptb-compact-tab {
-  flex: 0 0 auto !important;
-  width: 44px !important;
-  min-width: 44px !important;
+body.ptb-on .workspace-tabs .workspace-tab-header.ptb-compact-tab {
+  flex: 0 0 44px !important;
   max-width: 44px !important;
-  padding: 0 !important;
+  padding: 0;
   overflow: hidden;
 }
 
-body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-inner {
-  padding: 0 !important;
-  gap: 0 !important;
+body.ptb-on
+  .workspace-tabs
+  .workspace-tab-header.ptb-compact-tab
+  .workspace-tab-header-inner {
+  padding: 0;
+  gap: 0;
   justify-content: center;
 }
 
 /* 原标题、原图标、关闭按钮、置顶小图标一律让位给徽标 */
-body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-inner-title,
-body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-inner-icon,
-body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-inner-close-button,
-body.ptb-on .workspace-tab-header.ptb-compact-tab .workspace-tab-header-status-container {
-  display: none !important;
+body.ptb-on
+  .workspace-tabs
+  .workspace-tab-header.ptb-compact-tab
+  .workspace-tab-header-inner-title,
+body.ptb-on
+  .workspace-tabs
+  .workspace-tab-header.ptb-compact-tab
+  .workspace-tab-header-inner-icon,
+body.ptb-on
+  .workspace-tabs
+  .workspace-tab-header.ptb-compact-tab
+  .workspace-tab-header-inner-close-button,
+body.ptb-on
+  .workspace-tabs
+  .workspace-tab-header.ptb-compact-tab
+  .workspace-tab-header-status-container {
+  display: none;
 }
 
 /* 顶部收缩模式用的首字徽标（由插件注入到 header 内部） */

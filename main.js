@@ -53,7 +53,6 @@ const STRINGS = {
     'notice.pinUnsupported':
       '当前 Obsidian 版本不支持通过插件置顶标签，请右键标签手动置顶。',
     'notice.newWindowUnsupported': '当前版本不支持在新窗口打开。',
-    'notice.copied': '已复制：{0}',
     'notice.unpinFailed':
       '无法取消置顶。可以先把该标签改成「放回顶部」，再右键原标签操作。',
     'notice.hideFailed':
@@ -67,7 +66,6 @@ const STRINGS = {
     'menu.unpin': '取消置顶（变回普通标签）',
     'menu.openRight': '在右侧分屏打开',
     'menu.openWindow': '在新窗口打开',
-    'menu.copyPath': '复制文件路径',
     'menu.close': '关闭此标签',
     'menu.closeOthers': '关闭其他标签页（保留置顶）',
 
@@ -101,7 +99,7 @@ const STRINGS = {
     'settings.badgeSize.desc': '徽标方块里图标 / 文字区域的大小，单位 px。',
     'settings.help.title': '用法',
     'settings.help.line1':
-      '侧栏徽标：左键跳转并高亮；右键可换位置、取消置顶、右侧分屏、新窗口、复制路径、关闭。',
+      '侧栏徽标：左键跳转并高亮；右键可换位置、取消置顶、右侧分屏、新窗口、关闭。',
     'settings.help.line2':
       '顶部标签：双击它 → 直接收进侧栏。右键仍是 Obsidian 原生菜单。',
     'settings.help.line3': '每个标签的位置互相独立，三种状态可以同时存在。',
@@ -127,7 +125,6 @@ const STRINGS = {
       'This Obsidian version does not allow pinning through a plugin. Pin the tab from its context menu instead.',
     'notice.newWindowUnsupported':
       'Opening in a new window is not supported in this version.',
-    'notice.copied': 'Copied: {0}',
     'notice.unpinFailed':
       'Could not unpin. Move this tab back to the top bar first, then use its context menu.',
     'notice.hideFailed':
@@ -141,7 +138,6 @@ const STRINGS = {
     'menu.unpin': 'Unpin (back to normal tab)',
     'menu.openRight': 'Open in split to the right',
     'menu.openWindow': 'Open in new window',
-    'menu.copyPath': 'Copy file path',
     'menu.close': 'Close this tab',
     'menu.closeOthers': 'Close other tabs (keep pinned)',
 
@@ -178,7 +174,7 @@ const STRINGS = {
       'Size of the icon or text area inside the badge, in pixels.',
     'settings.help.title': 'Usage',
     'settings.help.line1':
-      'Sidebar badge: left click jumps to the file and highlights the badge; right click opens placement, unpin, split, new window, copy path, close.',
+      'Sidebar badge: left click jumps to the file and highlights the badge; right click opens placement, unpin, split, new window, close.',
     'settings.help.line2':
       'Top bar: pinned tabs stay where they are; double-click one to send it back to the sidebar. Right click keeps Obsidian own menu.',
     'settings.help.line3':
@@ -188,21 +184,16 @@ const STRINGS = {
   },
 };
 
+// 判断界面语言。只读运行时公开信息，不碰 localStorage / sessionStorage。
+// Obsidian 会把界面语言同步给 moment，所以优先用它，回退到浏览器语言。
 function detectLang() {
   let raw = '';
   try {
-    if (window.localStorage) raw = window.localStorage.getItem('language') || '';
+    if (window.moment && typeof window.moment.locale === 'function') {
+      raw = window.moment.locale() || '';
+    }
   } catch (e) {
     raw = '';
-  }
-  if (!raw) {
-    try {
-      if (window.moment && typeof window.moment.locale === 'function') {
-        raw = window.moment.locale() || '';
-      }
-    } catch (e) {
-      raw = '';
-    }
   }
   if (!raw) raw = navigator.language || 'en';
   return String(raw).toLowerCase().indexOf('zh') === 0 ? 'zh' : 'en';
@@ -1398,18 +1389,6 @@ class PinnedTabBar extends Plugin {
             }
           })
       );
-
-      if (item.path) {
-        menu.addItem((i) =>
-          i
-            .setTitle(this.t('menu.copyPath'))
-            .setIcon('copy')
-            .onClick(async () => {
-              await navigator.clipboard.writeText(item.path);
-              new Notice(this.t('notice.copied', item.path));
-            })
-        );
-      }
     }
 
     menu.addSeparator();
